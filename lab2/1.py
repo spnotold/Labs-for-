@@ -42,22 +42,29 @@ def main():
     #       再 dropna(subset=['score']) 丢掉没分数的行；
     #       对 age 用 groupby('class') 后的 transform(median) 来补。
     # ——在这里按上面的思路写代码——
-
+    df["score"] = pd.to_numeric(df["score"], errors="coerce")
+    df["age"] = pd.to_numeric(df["age"], errors="coerce")
+    df = df.dropna(subset=["score"])
+    df["age"] = df["age"].fillna(df.groupby("class")["age"].transform("median"))
     # 3) 打标签：passed，level
     df["passed"] = df["score"].apply(lambda s: s >= 60) 
     # level 的规则：>=90 优秀；80–89 良好；60–79 及格；其他 不及格
     # ——在这里用 Series.apply(lambda x: ...) 写出 level 列——
-
+    df["level"] = df["score"].apply(lambda s: "优秀" if s >= 90 else "良好" if s >= 80 else "及格" if s >= 60 else "不及格")
     # 4) 每个班内部做 z-score
     # 做法：g = df.groupby('class')['score']; 取 mean 和 std（std=0 时当 1）；
     # 再按 (score - mean) / std 算一个新列 zscore，保留 3 位小数。
     # ——在这里把 zscore 算出来并写入 df['zscore']——
-
+    
+    std_values = df.groupby("class")["score"].transform("std")
+    std_safe=std_values.where(std_values != 0, 1)
+    df["zscore"] =( (df["score"] - df.groupby("class")["score"].transform("mean")) / std_safe).round(3)
     # 5) 统计与导出
     # (a) (class, level) 的 avg_age / avg_score → summary.csv
     # 思路：groupby(['class','level']).agg({'age':'mean', 'score':'mean'}) 或者 groupby+apply
     # ——在这里把 summary 算好并 to_csv(outdir/'summary.csv')——
-
+    summary = df.groupby(["class", "level"]).agg({"age": "mean", "score": "mean"})
+    summary.to_csv(outdir/"summary.csv")
     # (b) 每班 Top-K
     topk = (df.sort_values(["class", "score"], ascending=[True, False])
               .groupby("class")
