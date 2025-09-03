@@ -107,11 +107,22 @@ def main():
         result = compute(vals, cfg["threshold"], cfg["mode"])  # 计算
         print("平均值：", result)
     except ConfigError as e:
-        #...
+        print(f"配置相关错误：{e}")
+        sys.exit(1)
+        #...            
+    except DataError as e:
+        print(f"数据相关错误：{e}")
+        sys.exit(1)
+    except ComputationError as e:
+        print(f"计算阶段失败：{e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"其他错误：{e}")
+        sys.exit(1)
     # except ...
     # finally:
     #     ...
-    pass
+##    pass
 
 
 if __name__ == "__main__":
