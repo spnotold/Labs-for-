@@ -48,7 +48,32 @@ def deep_merge(*dicts, list_policy="extend"):
     # - 如果 a 和 b 都是“列表”：要么拼接（extend），要么直接用 b 覆盖（overwrite）
     # - 其他类型：直接 b 覆盖 a
     # ——在这里实现 merge，并从左到右把所有 dict 合起来——
-    return {}  # TODO: 把合并后的大字典返回
+    def merge(a,b):
+        if isinstance(a,dict) and isinstance(b,dict):
+            result = a.copy()
+            for key,value in b.items():
+                if key in result and isinstance(result[key],dict) and isinstance(value,dict):
+                    result[key] = merge(result[key],value)
+                elif key in result and isinstance(result[key],list) and isinstance(value,list):
+                    if list_policy == "extend":
+                        result[key].extend(value)
+                    elif list_policy == "overwrite":
+                        result[key] = value
+                else:
+                    result[key] = value
+            return result
+        elif isinstance(a,list) and isinstance(b,list):
+            if list_policy == "extend":
+                return a + b
+            elif list_policy == "overwrite":
+                return b
+        else:
+            return b
+    result = {}
+    for d in dicts:
+        result = merge(result,d)
+    return result
+   # return {}  # TODO: 把合并后的大字典返回
 
 if __name__ == "__main__":
 
