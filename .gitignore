@@ -12,6 +12,7 @@ AI-Rules.md
 .ai-rules
 .cursor-instructions
 cursor-instructions.md
+rules/
 
 # IDE和编辑器相关
 .vscode/
