@@ -11,9 +11,7 @@ def linear_regression(X, y):
     '''
     P, N = X.shape
     w = np.zeros((P + 1, 1))
-    # YOUR CODE HERE
-    # begin answer
-    #TODO
-    # begin answer
-    # end answer
+    temp = np.ones((1,N))
+    X = np.vstack((temp,X))
+    w = np.linalg.inv(X @ X.T) @ X @ y.T
     return w
