@@ -31,7 +31,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 # ========= 配置 =========
 
 model_name_or_path = r"/data/shenzm/llama3/Meta-Llama-3.1-8B-Instruct"
-output_dir = "./xxx/chat_logs"         # 日志输出目录，xxx自命名避免覆盖小组同学
+output_dir = "./lyh/chat_logs"         # 日志输出目录，xxx自命名避免覆盖小组同学
 max_new_tokens = 256               # 每次生成的最长新token数
 temperature = 0.7
 top_p = 0.9
@@ -50,12 +50,19 @@ else:
 # ========= 加载分词器 & 模型（本地） =========
 # TODO 要求：
 # 1) 加载 tokenizer 与模型
+tokenizer = AutoTokenizer.from_pretrained(
+    model_name_or_path,
+    use_fast=True,
+)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name_or_path,
+    torch_dtype=torch_dtype,
+    device_map="auto"
+)
 # 2) tokenizer 建议 use_fast=True
 # 3) 模型 dtype 使用上方 torch_dtype
 # 4) GPU 环境可 device_map="auto"，CPU 环境可 model.to("cpu")
 #
-model = ...
-tokenizer = ...
 
 model.eval()  # 切换为推理模式
 
